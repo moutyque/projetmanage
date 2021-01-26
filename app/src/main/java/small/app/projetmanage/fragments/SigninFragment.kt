@@ -6,14 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.android.synthetic.main.fragment_signin.*
-import small.app.projetmanage.BaseActivity
 import small.app.projetmanage.R
+import small.app.projetmanage.activities.BaseActivity
 import small.app.projetmanage.firebase.Firestore
 
 
@@ -25,14 +23,12 @@ import small.app.projetmanage.firebase.Firestore
 class SigninFragment : Fragment() {
     private lateinit var activity: BaseActivity
 
-    private var isLogin = MutableLiveData<Boolean>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         activity = requireActivity() as BaseActivity
-        isLogin.value = false
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_signin, container, false)
@@ -78,15 +74,15 @@ class SigninFragment : Fragment() {
                     if (task.isSuccessful) {
                         val firebaseUser: FirebaseUser = task.result!!.user!!
                         val registerEmail = firebaseUser.email!!
-                        isLogin.observe(viewLifecycleOwner, Observer { result ->
-                            if (result) {
+
+
+                        Firestore.signInUser()
+                        Firestore.loginUser.observe(viewLifecycleOwner, { result ->
+                            if (result != null) {
                                 requireView().findNavController()
                                     .navigate(SigninFragmentDirections.actionSigninFragmentToMainFragment())
                             }
                         })
-
-                        Firestore.signInUser(isLogin)
-
 
                     } else {
                         activity.showErrorSnackBar(task.exception!!.message!!)

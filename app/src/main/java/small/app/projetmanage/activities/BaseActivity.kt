@@ -1,4 +1,4 @@
-package small.app.projetmanage
+package small.app.projetmanage.activities
 
 import android.app.Dialog
 import android.os.Bundle
@@ -6,9 +6,13 @@ import android.os.Handler
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.dialog_progress.*
+import small.app.projetmanage.R
 
 open class BaseActivity : AppCompatActivity() {
     private var doubleBackToExistPressedOnce = false
@@ -59,8 +63,28 @@ open class BaseActivity : AppCompatActivity() {
         val snackbar =
             Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG)
         val snackbarView = snackbar.view
-        snackbarView.setBackgroundColor(ContextCompat.getColor(this, R.color.snack_error_color))
+        snackbarView.setBackgroundColor(ContextCompat.getColor(this, R.color.snackbar_error_color))
 
         snackbar.show()
+    }
+
+
+    fun setupDefaultActionBar() {
+        setSupportActionBar(toolbar_main_activity)
+        toolbar_main_activity.setNavigationIcon(R.drawable.ic_action_navigation_menu)
+        toolbar_main_activity.setNavigationOnClickListener {
+            toggleDrawer()
+        }
+
+    }
+
+    private fun toggleDrawer() {
+        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
+
+            drawer_layout.closeDrawer(GravityCompat.START)
+        } else {
+            drawer_layout.openDrawer(GravityCompat.START)
+
+        }
     }
 }

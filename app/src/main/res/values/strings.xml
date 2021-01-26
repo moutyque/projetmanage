@@ -7,15 +7,20 @@
     <string name="sign_in">SIGN IN</string>
     <string name="sign_up">SIGN UP</string>
 
-    <!--TODO (Step 6: Add all the string values here.)-->
-    <!--START-->
     <string name="sign_up_description_text">Enter your name, email id and password, to register with us.</string>
     <string name="name">Name</string>
     <string name="password">Password</string>
     <string name="email">Email</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="please_wait">Please Wait</string>
-    <string name="please_click_back_again_to_exit">Please click back again to exit</string>
+
+    <string name="sign_in_description_text">Enter your name, email id and password, to register with us.</string>
+
+    <string name="please_click_back_again_to_exit">Please click back again to exit.</string>
+    <string name="please_wait">Please Wait&#8230;</string>
+
+    <!--TODO (Step 9: All the string values are added here.)-->
+    <!--START-->
+    <string name="nav_my_profile">My Profile</string>
+    <string name="nav_sign_out">Sign Out</string>
+    <string name="hello_blank_fragment">Hello World!!</string>
     <!--END-->
 </resources>

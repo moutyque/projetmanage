@@ -10,8 +10,8 @@ import androidx.navigation.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.android.synthetic.main.fragment_signup.*
-import small.app.projetmanage.BaseActivity
 import small.app.projetmanage.R
+import small.app.projetmanage.activities.BaseActivity
 import small.app.projetmanage.firebase.Firestore
 import small.app.projetmanage.models.User
 

@@ -11,6 +11,7 @@ import androidx.navigation.findNavController
 import kotlinx.android.synthetic.main.fragment_splash.*
 import small.app.projetmanage.R
 import small.app.projetmanage.firebase.Firestore
+import small.app.projetmanage.firebase.Firestore.Companion.signInUser
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -33,14 +34,15 @@ class SplashFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val typeFace = Typeface.createFromAsset(requireActivity().assets, "carbon bl.ttf");
+        val typeFace = Typeface.createFromAsset(requireActivity().assets, "carbon bl.ttf")
         tv_app_name.typeface = typeFace
         super.onViewCreated(view, savedInstanceState)
 
         Handler().postDelayed({
 
             var currentUserId = Firestore.getCurrentUserId()
-            if (currentUserId.isNullOrEmpty()) {
+            if (!currentUserId.isNullOrEmpty()) {
+                signInUser()
                 view.findNavController()
                     .navigate(SplashFragmentDirections.actionSplashFragmentToMainFragment())
             } else {
