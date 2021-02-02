@@ -20,7 +20,7 @@ import small.app.projetmanage.firebase.Firestore
  * Use the [SigninFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class SigninFragment : Fragment() {
+class SigninFragment : DefaultFragment() {
     private lateinit var activity: BaseActivity
 
 

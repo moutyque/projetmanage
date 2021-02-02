@@ -16,6 +16,18 @@ class Firestore {
     companion object {
         private val mFirestore = FirebaseFirestore.getInstance()
         var loginUser = MutableLiveData<User>()
+
+        fun updateUserProfileData(userMap: Map<String, Any>): Boolean {
+            var returnVal = false
+            mFirestore.collection(USERS).document(getCurrentUserId()).update(userMap)
+                .addOnSuccessListener {
+                    Log.i("Update", "The update happend")
+                    returnVal = true
+                }
+
+            return returnVal
+        }
+
         fun registerUser(activity: BaseActivity, userInfo: User) {
             mFirestore.collection(USERS).document(getCurrentUserId())
                 .set(userInfo, SetOptions.merge())

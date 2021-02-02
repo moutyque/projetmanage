@@ -20,7 +20,7 @@ import small.app.projetmanage.models.User
  * Use the [SignupFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class SignupFragment : Fragment() {
+class SignupFragment : DefaultFragment() {
     // TODO: Rename and change types of parameters
 
     private lateinit var activity: BaseActivity

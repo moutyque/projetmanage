@@ -15,6 +15,13 @@ import kotlinx.android.synthetic.main.dialog_progress.*
 import small.app.projetmanage.R
 
 open class BaseActivity : AppCompatActivity() {
+
+    companion object {
+        const val READ_STORAGE_PERMISSION_CODE = 1
+        const val PICK_IMAGE_REQUEST_CODE = 2
+
+    }
+
     private var doubleBackToExistPressedOnce = false
 
     private lateinit var mProgressDialog: Dialog
@@ -72,10 +79,10 @@ open class BaseActivity : AppCompatActivity() {
     fun setupDefaultActionBar() {
         setSupportActionBar(toolbar_main_activity)
         toolbar_main_activity.setNavigationIcon(R.drawable.ic_action_navigation_menu)
+
         toolbar_main_activity.setNavigationOnClickListener {
             toggleDrawer()
         }
-
     }
 
     private fun toggleDrawer() {

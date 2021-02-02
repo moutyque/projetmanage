@@ -1,6 +1,10 @@
 package small.app.projetmanage.activities
 
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Log
 import android.view.MenuItem
 import android.view.WindowManager
 import android.widget.Toast
@@ -30,11 +34,48 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         })
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == BaseActivity.READ_STORAGE_PERMISSION_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                showImagePicker()
+            }
+        } else {
+            Toast.makeText(
+                this,
+                "Oops, you just denied the permission for storage. You must accept to pick a profil picture.",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
+    fun showImagePicker() {
+        val galleryInt = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        startActivityForResult(galleryInt, PICK_IMAGE_REQUEST_CODE)
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        for (fragment in supportFragmentManager.fragments) {
+            fragment.onActivityResult(requestCode, resultCode, data)
+        }
+    }
 
     override fun onBackPressed() {
+        Log.d("MainActivity", "OnBackPressed")
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
+            Log.d("MainActivity", "closeDrawer")
+
             drawer_layout.closeDrawer(GravityCompat.START)
         } else {
+            Log.d("MainActivity", "doubleBackToExit")
+
             doubleBackToExit()
         }
 
@@ -43,6 +84,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.nav_my_profile -> {
+                drawer_layout.closeDrawer(GravityCompat.START)
+
                 Toast.makeText(applicationContext, "My Profile", Toast.LENGTH_LONG).show()
                 val navController = findNavController(R.id.fragment_nav)
                 navController.navigate(R.id.profileFragment)

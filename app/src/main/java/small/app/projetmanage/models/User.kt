@@ -12,7 +12,21 @@ data class User(
     val mobile: Long = 0,
     val fcmToken: String = ""
 ) : Parcelable {
-    
+
+    companion object {
+        const val IMAGE: String = "image"
+        const val NAME: String = "name"
+        const val MOBILE: String = "mobile"
+    }
+
+    fun toHashMap(): Map<String, Any> {
+        val userHahMap = HashMap<String, Any>()
+        userHahMap[IMAGE] = image
+        userHahMap[NAME] = name
+        userHahMap[MOBILE] = mobile
+        return userHahMap
+    }
+
 }
   
 

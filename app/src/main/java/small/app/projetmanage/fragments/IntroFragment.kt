@@ -15,7 +15,7 @@ import small.app.projetmanage.R
  * Use the [IntroFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class IntroFragment : Fragment() {
+class IntroFragment : DefaultFragment() {
 
 
     override fun onCreateView(
