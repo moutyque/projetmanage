@@ -3,7 +3,6 @@ package small.app.projetmanage.activities
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.view.MenuItem
 import android.view.WindowManager
@@ -11,18 +10,33 @@ import android.widget.Toast
 import androidx.core.view.GravityCompat
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import com.bumptech.glide.Glide
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.nav_header_main.*
+import kotlinx.android.synthetic.main.nav_layout.view.*
 import small.app.projetmanage.R
+import small.app.projetmanage.databinding.ActivityMainBinding
 import small.app.projetmanage.firebase.Firestore
+import small.app.projetmanage.utils.Constants.showImagePicker
+import small.app.projetmanage.utils.Constants.updatePictureInFragment
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
+
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding.drawerLayout.fab_create_board.setOnClickListener {
+            val navController = findNavController(R.id.fragment_nav)
+            navController.navigate(R.id.createBoardFragment)
+
+            //val navOptions = NavOptions.Builder().setPopUpTo(R.id.createBoardFragment, true).build()
+            //navController.navigate(R.id.createBoardFragment, null, navOptions)
+
+        }
+        setContentView(binding.root)
         window.setFlags(
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN
@@ -34,6 +48,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         })
     }
 
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -43,7 +58,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         if (requestCode == BaseActivity.READ_STORAGE_PERMISSION_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                showImagePicker()
+                showImagePicker(this)
             }
         } else {
             Toast.makeText(
@@ -54,11 +69,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
     }
 
-    fun showImagePicker() {
-        val galleryInt = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        startActivityForResult(galleryInt, PICK_IMAGE_REQUEST_CODE)
-
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -94,7 +104,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
             R.id.nav_sign_out -> {
                 FirebaseAuth.getInstance().signOut()
-                navigateFirstTabWithClearStack()
+                navigateFirstTabWithClearStack(R.id.introFragment)
                 //setupNavDrawer(drawer_layout,nav_view)
                 drawer_layout.closeDrawer(GravityCompat.START)
             }
@@ -104,13 +114,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
 
-    fun navigateFirstTabWithClearStack() {
+    fun navigateFirstTabWithClearStack(id: Int) {
         val navController = findNavController(R.id.fragment_nav)
         val navHostFragment: NavHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_nav) as NavHostFragment
         val inflater = navHostFragment.navController.navInflater
         val graph = inflater.inflate(R.navigation.nav)
-        graph.startDestination = R.id.introFragment
+        graph.startDestination = id
 
         navController.graph = graph
 
@@ -119,12 +129,12 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     fun updateNavigationUserDetails() {
         // The instance of the header view of the navigation view.
-
-        Glide.with(this).load(this)
-            .load(Firestore.loginUser.value!!.image)
-            .centerCrop()
-            .placeholder(R.drawable.ic_user_place_holder)
-            .into(iv_user_image)
+        updatePictureInFragment(
+            this,
+            Firestore.loginUser.value!!.image,
+            R.drawable.ic_user_place_holder,
+            iv_user_image
+        )
 
         tv_username.text = Firestore.loginUser.value!!.name
     }

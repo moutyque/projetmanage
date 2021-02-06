@@ -62,4 +62,9 @@
         android:name="small.app.projetmanage.fragments.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" />
+    <fragment
+        android:id="@+id/createBoardFragment"
+        android:name="small.app.projetmanage.fragments.CreateBoardFragment"
+        android:label="fragment_create_board"
+        tools:layout="@layout/fragment_create_board" />
 </navigation>

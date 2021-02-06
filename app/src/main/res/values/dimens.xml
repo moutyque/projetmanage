@@ -58,8 +58,11 @@
     <dimen name="my_profile_btn_update_marginTop">30dp</dimen>
 
 
-    <string name="mobile">Mobile</string>
-    <string name="update">UPDATE</string>
-    <string name="my_profile_title">My Profile</string>
+    <dimen name="fab_marging">16dp</dimen>
+    <dimen name="create_board_content_padding">16dp</dimen>
+    <dimen name="board_image_size">100dp</dimen>
+    <dimen name="create_board_til_marginTop">25dp</dimen>
+    <dimen name="create_board_btn_marginTop">30dp</dimen>
+
     <!--END-->
 </resources>

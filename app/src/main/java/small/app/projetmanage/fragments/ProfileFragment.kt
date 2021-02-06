@@ -6,29 +6,28 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.MimeTypeMap
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.google.firebase.storage.FirebaseStorage
-import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.fragment_profile.*
-import kotlinx.android.synthetic.main.nav_header_main.*
 import small.app.projetmanage.R
 import small.app.projetmanage.activities.BaseActivity
 import small.app.projetmanage.activities.MainActivity
 import small.app.projetmanage.databinding.FragmentProfileBinding
 import small.app.projetmanage.firebase.Firestore
+import small.app.projetmanage.firebase.Firestore.Companion.updateUserInfo
 import small.app.projetmanage.models.UserModel
+import small.app.projetmanage.utils.Constants.PICK_IMAGE_REQUEST_CODE
+import small.app.projetmanage.utils.Constants.getFileExtension
+import small.app.projetmanage.utils.Constants.showImagePicker
 
 
 /**
@@ -59,18 +58,23 @@ class ProfileFragment : Fragment() {
 
         //When the user image change the picture is updated in the view
         user.image.observe(viewLifecycleOwner, Observer {
-            Glide.with(this).load(this)
-                .load(it)
-                .centerCrop()
-                .placeholder(R.drawable.ic_user_place_holder)
-                .into(binding.ivUserImage)
+
         })
 
         binding.ivUserImage.setOnClickListener {
             pickPicture()
         }
         binding.etMobile.doOnTextChanged { text, start, before, count ->
-            user.mobile.value = text.toString().toLong()
+            try {
+                user.mobile.value = text.toString().toLong()
+            } catch (e: NumberFormatException) {
+                Toast.makeText(
+                    context,
+                    "The phone number must be a numeric value.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
         }
 
         binding.btnUpdate.setOnClickListener {
@@ -78,7 +82,9 @@ class ProfileFragment : Fragment() {
             Firestore.updateUserProfileData(
                 user.toUser().toHashMap()
             )
-            (requireActivity() as ComponentActivity).onBackPressed()
+            updateUserInfo(user.toUser())
+
+            (requireActivity() as BaseActivity).singleBackToExit()
         }
 
         return binding.root
@@ -100,7 +106,7 @@ class ProfileFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK && requestCode == BaseActivity.PICK_IMAGE_REQUEST_CODE && data!!.data != null) {
+        if (resultCode == Activity.RESULT_OK && requestCode == PICK_IMAGE_REQUEST_CODE && data!!.data != null) {
             binding.user!!.image.value = data.data.toString()
             pictureUpdate = true
         }
@@ -151,9 +157,8 @@ class ProfileFragment : Fragment() {
                 Manifest.permission.READ_EXTERNAL_STORAGE
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            val galleryInt =
-                Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            startActivityForResult(galleryInt, BaseActivity.PICK_IMAGE_REQUEST_CODE)
+            showImagePicker(requireActivity())
+
         } else {
             requireActivity().requestPermissions(
                 arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
@@ -167,7 +172,10 @@ class ProfileFragment : Fragment() {
         if (binding.user!!.image.value != null) {
             val uri = Uri.parse(binding.user!!.image.value)
             val sRef = FirebaseStorage.getInstance().reference.child(
-                "USER_IMAGE" + System.currentTimeMillis() + "." + getFileExtension(uri)
+                "USER_IMAGE" + System.currentTimeMillis() + "." + getFileExtension(
+                    requireActivity(),
+                    uri
+                )
             )
             sRef.putFile(uri).addOnSuccessListener { it ->
                 Log.d("UploadFile", it.metadata!!.reference!!.downloadUrl.toString())
@@ -183,9 +191,5 @@ class ProfileFragment : Fragment() {
 
     }
 
-    private fun getFileExtension(uri: Uri?): String? {
-        return MimeTypeMap.getSingleton()
-            .getExtensionFromMimeType(requireActivity().contentResolver.getType(uri!!))
-    }
 
 }

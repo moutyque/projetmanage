@@ -49,6 +49,10 @@ class Firestore {
                 }
         }
 
+        fun updateUserInfo(user: User) {
+            loginUser.value = user
+        }
+
 
         fun getCurrentUserId(): String {
             var currentUser = getInstance().currentUser

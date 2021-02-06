@@ -18,7 +18,7 @@ open class BaseActivity : AppCompatActivity() {
 
     companion object {
         const val READ_STORAGE_PERMISSION_CODE = 1
-        const val PICK_IMAGE_REQUEST_CODE = 2
+        
 
     }
 
@@ -29,6 +29,7 @@ open class BaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_base)
     }
 
@@ -63,6 +64,11 @@ open class BaseActivity : AppCompatActivity() {
         Handler().postDelayed({
             doubleBackToExistPressedOnce = false
         }, 2000)
+    }
+
+    fun singleBackToExit() {
+        super.onBackPressed()
+        return
     }
 
 
