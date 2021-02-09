@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.view.GravityCompat
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.navigation.NavigationView
@@ -24,12 +25,13 @@ import small.app.projetmanage.utils.Constants.updatePictureInFragment
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var binding: ActivityMainBinding
+    lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         binding.drawerLayout.fab_create_board.setOnClickListener {
-            val navController = findNavController(R.id.fragment_nav)
             navController.navigate(R.id.createBoardFragment)
 
             //val navOptions = NavOptions.Builder().setPopUpTo(R.id.createBoardFragment, true).build()
@@ -46,6 +48,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         Firestore.loginUser.observe(this, {
             if (it != null) updateNavigationUserDetails()
         })
+    }
+
+    override fun onResume() {
+        navController = findNavController(R.id.fragment_nav)
+        super.onResume()
     }
 
 
@@ -72,6 +79,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        Log.d("MainActivity", "onActivityResult")
         for (fragment in supportFragmentManager.fragments) {
             fragment.onActivityResult(requestCode, resultCode, data)
         }

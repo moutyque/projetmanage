@@ -12,6 +12,7 @@ import com.google.firebase.auth.FirebaseUser
 import kotlinx.android.synthetic.main.fragment_signup.*
 import small.app.projetmanage.R
 import small.app.projetmanage.activities.BaseActivity
+import small.app.projetmanage.activities.MainActivity
 import small.app.projetmanage.firebase.Firestore
 import small.app.projetmanage.models.User
 
@@ -21,7 +22,7 @@ import small.app.projetmanage.models.User
  * create an instance of this fragment.
  */
 class SignupFragment : DefaultFragment() {
-    // TODO: Rename and change types of parameters
+
 
     private lateinit var activity: BaseActivity
     override fun onCreateView(
@@ -78,7 +79,7 @@ class SignupFragment : DefaultFragment() {
                     if (task.isSuccessful) {
                         val firebaseUser: FirebaseUser = task.result!!.user!!
                         val user = User(email = email, name = name, uid = firebaseUser.uid)
-                        Firestore.registerUser(activity, user)
+                        Firestore.registerUser(activity as MainActivity, user)
                         requireView().findNavController()
                             .navigate(SignupFragmentDirections.actionSignupFragmentToMainFragment())
 

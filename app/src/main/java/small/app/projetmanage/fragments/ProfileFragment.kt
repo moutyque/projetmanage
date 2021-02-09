@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,8 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import com.bumptech.glide.Glide
-import com.google.firebase.storage.FirebaseStorage
+import kotlinx.android.synthetic.main.fragment_create_board.*
 import kotlinx.android.synthetic.main.fragment_profile.*
 import small.app.projetmanage.R
 import small.app.projetmanage.activities.BaseActivity
@@ -25,8 +23,8 @@ import small.app.projetmanage.databinding.FragmentProfileBinding
 import small.app.projetmanage.firebase.Firestore
 import small.app.projetmanage.firebase.Firestore.Companion.updateUserInfo
 import small.app.projetmanage.models.UserModel
+import small.app.projetmanage.utils.Constants
 import small.app.projetmanage.utils.Constants.PICK_IMAGE_REQUEST_CODE
-import small.app.projetmanage.utils.Constants.getFileExtension
 import small.app.projetmanage.utils.Constants.showImagePicker
 
 
@@ -39,8 +37,6 @@ class ProfileFragment : Fragment() {
 
 
     private lateinit var binding: FragmentProfileBinding
-    private var privateUrl = ""
-
     private var pictureUpdate = false
 
     override fun onCreateView(
@@ -58,13 +54,18 @@ class ProfileFragment : Fragment() {
 
         //When the user image change the picture is updated in the view
         user.image.observe(viewLifecycleOwner, Observer {
-
+            Constants.updatePictureInFragment(
+                requireActivity(),
+                it,
+                R.drawable.ic_user_place_holder,
+                iv_user_image
+            )
         })
 
         binding.ivUserImage.setOnClickListener {
             pickPicture()
         }
-        binding.etMobile.doOnTextChanged { text, start, before, count ->
+        binding.etMobile.doOnTextChanged { text, _, _, _ ->
             try {
                 user.mobile.value = text.toString().toLong()
             } catch (e: NumberFormatException) {
@@ -78,12 +79,13 @@ class ProfileFragment : Fragment() {
         }
 
         binding.btnUpdate.setOnClickListener {
-            if (pictureUpdate) uploadUserImage()
+
+            //if (pictureUpdate) uploadUserImage()
             Firestore.updateUserProfileData(
-                user.toUser().toHashMap()
+                user.toUser().toHashMap() as HashMap<String, Any>,
+                requireActivity() as MainActivity
             )
             updateUserInfo(user.toUser())
-
             (requireActivity() as BaseActivity).singleBackToExit()
         }
 
@@ -105,6 +107,7 @@ class ProfileFragment : Fragment() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        Log.d("ProfileFragment", "onActivityResult")
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == PICK_IMAGE_REQUEST_CODE && data!!.data != null) {
             binding.user!!.image.value = data.data.toString()
@@ -157,7 +160,7 @@ class ProfileFragment : Fragment() {
                 Manifest.permission.READ_EXTERNAL_STORAGE
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            showImagePicker(requireActivity())
+            showImagePicker(this)
 
         } else {
             requireActivity().requestPermissions(
@@ -167,29 +170,14 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    private fun uploadUserImage() {
-        (requireActivity() as MainActivity).showProgressDialog(resources.getString(R.string.please_wait))
-        if (binding.user!!.image.value != null) {
-            val uri = Uri.parse(binding.user!!.image.value)
-            val sRef = FirebaseStorage.getInstance().reference.child(
-                "USER_IMAGE" + System.currentTimeMillis() + "." + getFileExtension(
-                    requireActivity(),
-                    uri
-                )
-            )
-            sRef.putFile(uri).addOnSuccessListener { it ->
-                Log.d("UploadFile", it.metadata!!.reference!!.downloadUrl.toString())
-                it.metadata!!.reference!!.downloadUrl.addOnSuccessListener { uri ->
-                    Log.d("UploadFile", uri.toString())
-                    binding.user!!.image.value = uri.toString()
-                }
-            }.addOnFailureListener { exception ->
-                Toast.makeText(requireContext(), exception.message, Toast.LENGTH_LONG).show()
-            }
-        }
-        (requireActivity() as MainActivity).hideProgressDialog()
-
-    }
+//    private fun uploadUserImage() {
+//        (requireActivity() as MainActivity).showProgressDialog(resources.getString(R.string.please_wait))
+//        if (binding.user!!.image.value != null) {
+//            uploadAndUpdatePicture(binding.user!!.image,requireActivity() as MainActivity)
+//        }
+//        (requireActivity() as MainActivity).hideProgressDialog()
+//
+//    }
 
 
 }

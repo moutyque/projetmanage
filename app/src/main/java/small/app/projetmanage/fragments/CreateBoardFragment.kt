@@ -3,23 +3,27 @@ package small.app.projetmanage.fragments
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import kotlinx.android.synthetic.main.fragment_create_board.*
+import kotlinx.coroutines.launch
 import small.app.projetmanage.R
 import small.app.projetmanage.activities.BaseActivity
+import small.app.projetmanage.activities.MainActivity
 import small.app.projetmanage.databinding.FragmentCreateBoardBinding
+import small.app.projetmanage.firebase.Firestore
+import small.app.projetmanage.models.BoardModel
 import small.app.projetmanage.utils.Constants
 
 class CreateBoardFragment : Fragment() {
 
     private lateinit var binding: FragmentCreateBoardBinding
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,26 +34,45 @@ class CreateBoardFragment : Fragment() {
             resources.getString(R.string.creat_board_title)
 
         binding = FragmentCreateBoardBinding.inflate(inflater)
-        return binding.root
-    }
+        val model = BoardModel()
+        binding.model = model
+        binding.lifecycleOwner = viewLifecycleOwner
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        iv_board_image.setOnClickListener {
-            Constants.showImagePicker(requireActivity())
-        }
-    }
+        binding.etBoardName.doOnTextChanged { text, _, _, _ -> model.name.value = text.toString() }
 
-    //TODO : that code is never reach
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK && requestCode == Constants.PICK_IMAGE_REQUEST_CODE && data!!.data != null) {
+        model.image.observe(viewLifecycleOwner, Observer {
             Constants.updatePictureInFragment(
                 requireActivity(),
-                data!!.data.toString(),
+                it,
                 R.drawable.ic_board_place_holder,
                 iv_board_image
             )
+        })
+        binding.ivBoardImage.setOnClickListener {
+            Constants.showImagePicker(this)
+        }
+
+        binding.btnCreate.setOnClickListener {
+
+
+            lifecycleScope.launch {
+                Firestore.createBoard(requireActivity() as MainActivity, model.toBoard())
+            }
+
+        }
+
+
+        return binding.root
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        Log.d("CreateBoardFragement", "onActivityResult")
+
+        if (resultCode == Activity.RESULT_OK && requestCode == Constants.PICK_IMAGE_REQUEST_CODE && data!!.data != null) {
+
+            binding.model!!.image.value = data.data.toString()
+
         }
     }
 

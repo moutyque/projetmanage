@@ -13,7 +13,7 @@ import small.app.projetmanage.R
 import small.app.projetmanage.firebase.Firestore
 import small.app.projetmanage.firebase.Firestore.Companion.signInUser
 
-// TODO: Rename parameter arguments, choose names that match
+
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
 
@@ -43,6 +43,7 @@ class SplashFragment : Fragment() {
             var currentUserId = Firestore.getCurrentUserId()
             if (!currentUserId.isNullOrEmpty()) {
                 signInUser()
+
                 view.findNavController()
                     .navigate(SplashFragmentDirections.actionSplashFragmentToMainFragment())
             } else {
