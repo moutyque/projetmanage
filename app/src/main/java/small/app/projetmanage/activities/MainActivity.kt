@@ -147,5 +147,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         tv_username.text = Firestore.loginUser.value!!.name
     }
 
+    fun setActionBarTitle(title: String?) {
+        supportActionBar!!.title = title
+    }
+
 
 }

@@ -5,11 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_main.*
-import kotlinx.android.synthetic.main.nav_header_main.*
 import small.app.projetmanage.R
+import small.app.projetmanage.activities.MainActivity
 import small.app.projetmanage.adapters.BoardItemsAdapter
 import small.app.projetmanage.firebase.Firestore.Companion.loadBoardsList
 import small.app.projetmanage.models.Board
@@ -29,9 +29,12 @@ class MainFragment : DefaultFragment() {
         return inflater.inflate(R.layout.fragment_main, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+
+    override fun onResume() {
+        (requireActivity() as MainActivity).setActionBarTitle(resources.getString(R.string.app_name))
+
         loadBoardsList(this)
+        super.onResume()
     }
 
     fun populateBoardListToUI(boardsList: ArrayList<Board>) {
@@ -44,6 +47,17 @@ class MainFragment : DefaultFragment() {
 
             val adapter = BoardItemsAdapter(requireContext(), boardsList)
             rv_boards_list.adapter = adapter
+            adapter.setOnClickListener(object :
+                BoardItemsAdapter.BoardItemsViewHolder.OnClickListener {
+                override fun onClick(position: Int, model: Board) {
+                    findNavController().navigate(
+                        MainFragmentDirections.actionMainFragmentToTaskListFragment(
+                            model
+                        )
+                    )
+                }
+
+            })
 
 
         } else {

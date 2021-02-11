@@ -36,6 +36,8 @@ open class BoardItemsAdapter(private val context: Context, private var list: Arr
 
 
             holder.itemView.setOnClickListener {
+
+
                 if (onClickListener != null) onClickListener!!.onClick(position, model)
             }
         }
@@ -47,7 +49,11 @@ open class BoardItemsAdapter(private val context: Context, private var list: Arr
         return list.size
     }
 
-    private class BoardItemsViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    fun setOnClickListener(onClickListener: BoardItemsViewHolder.OnClickListener) {
+        this.onClickListener = onClickListener
+    }
+
+    class BoardItemsViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         interface OnClickListener {
             fun onClick(position: Int, model: Board)
         }

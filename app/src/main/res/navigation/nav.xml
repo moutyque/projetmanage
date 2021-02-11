@@ -56,6 +56,9 @@
             app:launchSingleTop="true"
             app:popUpTo="@+id/nav"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_mainFragment_to_taskListFragment"
+            app:destination="@id/taskListFragment" />
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
@@ -67,4 +70,13 @@
         android:name="small.app.projetmanage.fragments.CreateBoardFragment"
         android:label="fragment_create_board"
         tools:layout="@layout/fragment_create_board" />
+    <fragment
+        android:id="@+id/taskListFragment"
+        android:name="small.app.projetmanage.fragments.TaskListFragment"
+        android:label="fragment_task_list"
+        tools:layout="@layout/fragment_task_list" >
+        <argument
+            android:name="board"
+            app:argType="small.app.projetmanage.models.Board" />
+    </fragment>
 </navigation>
