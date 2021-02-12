@@ -18,7 +18,7 @@ open class BaseActivity : AppCompatActivity() {
 
     companion object {
         const val READ_STORAGE_PERMISSION_CODE = 1
-        
+
 
     }
 
@@ -31,6 +31,10 @@ open class BaseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_base)
+    }
+
+    fun showProgressDialog() {
+        showProgressDialog(resources.getString(R.string.please_wait))
     }
 
     fun showProgressDialog(text: String) {

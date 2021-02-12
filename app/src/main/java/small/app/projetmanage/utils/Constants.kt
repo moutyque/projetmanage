@@ -13,7 +13,7 @@ object Constants {
 
     const val USERS = "Users"
     const val BOARD = "Boards"
-
+    const val TASK = "Task"
     const val PICK_IMAGE_REQUEST_CODE = 2
     const val ASSIGNED_TO = "assignedTo"
 

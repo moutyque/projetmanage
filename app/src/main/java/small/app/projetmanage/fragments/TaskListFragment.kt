@@ -6,10 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.android.synthetic.main.fragment_task_list.*
 import small.app.projetmanage.R
 import small.app.projetmanage.activities.MainActivity
+import small.app.projetmanage.adapters.TaskListItemsAdapter
 import small.app.projetmanage.models.Board
+import small.app.projetmanage.models.Task
+
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -30,15 +36,45 @@ class TaskListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-
         board = args.board
 
         (requireActivity() as MainActivity).setActionBarTitle(board.name)
         Log.d("TaskList", "We get board : ${args.board.name}")
+        Log.d("TaskList", "its id is : ${args.board.documentId}")
+
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_task_list, container, false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
+
+        rv_task_list.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        rv_task_list.setHasFixedSize(true)
+
+        super.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onResume() {
+        //Task for the button, it's a trick
+        val addTaskList = Task(resources.getString(R.string.add_list))
+        board.taskList.add(addTaskList)
+
+        val adapter = TaskListItemsAdapter(requireContext(), board.taskList, board, this)
+        rv_task_list.adapter = adapter
+        super.onResume()
+    }
+
+
+    fun refreshFragment() {
+        val transaction: FragmentTransaction =
+            requireActivity().supportFragmentManager.beginTransaction()
+        transaction.setReorderingAllowed(false)
+        transaction.detach(this).attach(this).commitAllowingStateLoss()
+    }
 }
+
+
+

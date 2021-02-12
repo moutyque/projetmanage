@@ -56,9 +56,7 @@ class Firestore {
         }
 
         fun createBoard(activity: MainActivity, boardInfo: Board) {
-
             val image = MutableLiveData<String>()
-
             uploadAndUpdatePicture(image = boardInfo.image, activity = activity, result = image)
             image.observe(activity, Observer {
                 val bInfo = Board(
@@ -80,6 +78,17 @@ class Firestore {
 
             })
 
+        }
+
+        fun updateBoardTaskList(boardInfo: Board) {
+            mFirestore.collection(BOARD)
+                .document(boardInfo.documentId)
+                .update(boardInfo.toHashMap())
+                .addOnSuccessListener {
+
+                }.addOnFailureListener { e ->
+                    Log.e("Firestore", "Error writing document.")
+                }
         }
 
         private fun createBoardSuccess(activity: MainActivity) {
@@ -195,6 +204,7 @@ class Firestore {
                 }
 
         }
+
 
     }//End of companion object
 }
