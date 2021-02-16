@@ -34,9 +34,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         binding.drawerLayout.fab_create_board.setOnClickListener {
             navController.navigate(R.id.createBoardFragment)
 
-            //val navOptions = NavOptions.Builder().setPopUpTo(R.id.createBoardFragment, true).build()
-            //navController.navigate(R.id.createBoardFragment, null, navOptions)
-
         }
         setContentView(binding.root)
         window.setFlags(
@@ -48,11 +45,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         Firestore.loginUser.observe(this, {
             if (it != null) updateNavigationUserDetails()
         })
-    }
-
-    override fun onResume() {
-        navController = findNavController(R.id.fragment_nav)
-        super.onResume()
     }
 
 
@@ -121,6 +113,14 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         return true
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_members -> {
+                findNavController(R.id.fragment_nav).navigate(R.id.membersFragment)
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
     fun navigateFirstTabWithClearStack(id: Int) {
         val navController = findNavController(R.id.fragment_nav)

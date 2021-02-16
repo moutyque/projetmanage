@@ -88,6 +88,7 @@ open class BaseActivity : AppCompatActivity() {
 
     fun setupDefaultActionBar() {
         setSupportActionBar(toolbar_main_activity)
+
         toolbar_main_activity.setNavigationIcon(R.drawable.ic_action_navigation_menu)
 
         toolbar_main_activity.setNavigationOnClickListener {

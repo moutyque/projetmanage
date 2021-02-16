@@ -26,8 +26,8 @@ data class Board(
         boardHashmap[IMAGE] = image
         boardHashmap[NAME] = name
         boardHashmap[CREATED_BY] = createdBy
-        boardHashmap[ASSIGNED_TO] = ASSIGNED_TO
-        boardHashmap[TASK_LIST] = TASK_LIST
+        boardHashmap[ASSIGNED_TO] = assignedTo
+        boardHashmap[TASK_LIST] = taskList
 
         return boardHashmap
     }

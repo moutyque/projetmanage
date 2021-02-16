@@ -18,9 +18,11 @@ class BoardModel {
 
         val list = ArrayList<String>()
         list.add(Firestore.loginUser.value!!.uid)
+        val img = if (image.value == null) "" else image.value
+
         return Board(
             name = name.value!!,
-            image = image.value!!,
+            image = img!!,
             createdBy = Firestore.loginUser.value!!.name,
             assignedTo = list
         )

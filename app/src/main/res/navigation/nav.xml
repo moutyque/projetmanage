@@ -74,9 +74,14 @@
         android:id="@+id/taskListFragment"
         android:name="small.app.projetmanage.fragments.TaskListFragment"
         android:label="fragment_task_list"
-        tools:layout="@layout/fragment_task_list" >
+        tools:layout="@layout/fragment_task_list">
         <argument
             android:name="board"
             app:argType="small.app.projetmanage.models.Board" />
     </fragment>
+    <fragment
+        android:id="@+id/membersFragment"
+        android:name="small.app.projetmanage.fragments.MembersFragment"
+        android:label="fragment_members"
+        tools:layout="@layout/fragment_members" />
 </navigation>

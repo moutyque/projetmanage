@@ -1,9 +1,7 @@
 package small.app.projetmanage.fragments
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -11,7 +9,7 @@ import kotlinx.android.synthetic.main.fragment_main.*
 import small.app.projetmanage.R
 import small.app.projetmanage.activities.MainActivity
 import small.app.projetmanage.adapters.BoardItemsAdapter
-import small.app.projetmanage.firebase.Firestore.Companion.loadBoardsList
+import small.app.projetmanage.firebase.Firestore
 import small.app.projetmanage.models.Board
 
 /**
@@ -25,6 +23,7 @@ class MainFragment : DefaultFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_main, container, false)
     }
@@ -32,10 +31,10 @@ class MainFragment : DefaultFragment() {
 
     override fun onResume() {
         (requireActivity() as MainActivity).setActionBarTitle(resources.getString(R.string.app_name))
-
-        loadBoardsList(this)
+        Firestore.loadBoardsList(this)
         super.onResume()
     }
+
 
     fun populateBoardListToUI(boardsList: ArrayList<Board>) {
         if (!boardsList.isEmpty()) {

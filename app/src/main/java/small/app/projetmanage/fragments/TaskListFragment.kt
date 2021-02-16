@@ -2,11 +2,8 @@ package small.app.projetmanage.fragments
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_task_list.*
@@ -42,7 +39,7 @@ class TaskListFragment : Fragment() {
         Log.d("TaskList", "We get board : ${args.board.name}")
         Log.d("TaskList", "its id is : ${args.board.documentId}")
 
-
+        setHasOptionsMenu(true)
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_task_list, container, false)
     }
@@ -69,10 +66,13 @@ class TaskListFragment : Fragment() {
 
 
     fun refreshFragment() {
-        val transaction: FragmentTransaction =
-            requireActivity().supportFragmentManager.beginTransaction()
-        transaction.setReorderingAllowed(false)
-        transaction.detach(this).attach(this).commitAllowingStateLoss()
+
+        this.parentFragmentManager.beginTransaction().detach(this).attach(this).commit()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_members, menu)
+        super.onCreateOptionsMenu(menu, inflater)
     }
 }
 
