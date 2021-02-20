@@ -1,7 +1,10 @@
 package small.app.projetmanage.fragments
 
 import android.os.Bundle
-import android.view.*
+import android.os.Parcelable
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -9,6 +12,7 @@ import kotlinx.android.synthetic.main.fragment_main.*
 import small.app.projetmanage.R
 import small.app.projetmanage.activities.MainActivity
 import small.app.projetmanage.adapters.BoardItemsAdapter
+import small.app.projetmanage.adapters.OnClickListener
 import small.app.projetmanage.firebase.Firestore
 import small.app.projetmanage.models.Board
 
@@ -28,8 +32,13 @@ class MainFragment : DefaultFragment() {
         return inflater.inflate(R.layout.fragment_main, container, false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        (requireActivity() as MainActivity).setNavController(findNavController())
+        super.onViewCreated(view, savedInstanceState)
+    }
 
     override fun onResume() {
+
         (requireActivity() as MainActivity).setActionBarTitle(resources.getString(R.string.app_name))
         Firestore.loadBoardsList(this)
         super.onResume()
@@ -47,11 +56,11 @@ class MainFragment : DefaultFragment() {
             val adapter = BoardItemsAdapter(requireContext(), boardsList)
             rv_boards_list.adapter = adapter
             adapter.setOnClickListener(object :
-                BoardItemsAdapter.BoardItemsViewHolder.OnClickListener {
-                override fun onClick(position: Int, model: Board) {
+                OnClickListener {
+                override fun onClick(model: Parcelable) {
                     findNavController().navigate(
                         MainFragmentDirections.actionMainFragmentToTaskListFragment(
-                            model
+                            model as Board
                         )
                     )
                 }

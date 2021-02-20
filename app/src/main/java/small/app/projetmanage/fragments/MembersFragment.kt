@@ -1,60 +1,105 @@
 package small.app.projetmanage.fragments
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.text.InputType
+import android.view.*
+import android.widget.EditText
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
 import small.app.projetmanage.R
+import small.app.projetmanage.adapters.MembersItemAdapter
+import small.app.projetmanage.databinding.FragmentMembersBinding
+import small.app.projetmanage.firebase.Firestore
+import small.app.projetmanage.firebase.Firestore.Companion.getUserByEmail
+import small.app.projetmanage.models.User
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [MembersFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class MembersFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var binding: FragmentMembersBinding
+    val args: MembersFragmentArgs by navArgs()
+    var members = MutableLiveData<List<User>>()
+    var newMember = MutableLiveData<User>()
+    private var email = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_members, container, false)
+        binding = FragmentMembersBinding.inflate(layoutInflater)
+
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.rvMembersList.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvMembersList.setHasFixedSize(true)
+        setHasOptionsMenu(true)
+        members.observe(viewLifecycleOwner, Observer {
+            val adapater = MembersItemAdapter(requireActivity(), it)
+            binding.rvMembersList.adapter = adapater
+
+        })
+
+        newMember.observe(viewLifecycleOwner, {
+//            val value = members.value
+//            val tmpList = ArrayList<User>()
+//            for (u in members.value!!) {
+//                tmpList.add(u)
+//            }
+//            tmpList.add(it)
+//            members.value = tmpList
+            args.board.assignedTo.add(it.uid)
+            refreshList()
+        })
+        refreshList()
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment MembersFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            MembersFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    override fun onResume() {
+        refreshList()
+        super.onResume()
     }
+
+    private fun refreshList() {
+
+        Firestore.getAssignedMembersListDetails(members, args.board.assignedTo)
+
+
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_add_member, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_add_member -> {
+                val builder: AlertDialog.Builder = AlertDialog.Builder(requireContext())
+                builder.setTitle("Email")
+                val input = EditText(requireContext())
+                input.inputType =
+                    InputType.TYPE_CLASS_TEXT
+                input.hint = "Email"
+                builder.setView(input)
+
+                builder.setPositiveButton("OK",
+                    DialogInterface.OnClickListener { dialog, which ->
+                        email = input.text.toString()
+                        getUserByEmail(email = email, user = newMember)
+                    })
+                builder.setNegativeButton("Cancel",
+                    DialogInterface.OnClickListener { dialog, which -> dialog.cancel() })
+
+                builder.show()
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
+
 }

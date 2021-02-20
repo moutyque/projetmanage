@@ -2,18 +2,22 @@ package small.app.projetmanage.adapters
 
 import android.content.Context
 import android.content.res.Resources
+import android.os.Parcelable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_tasks.view.*
 import small.app.projetmanage.R
 import small.app.projetmanage.activities.BaseActivity
 import small.app.projetmanage.firebase.Firestore
+import small.app.projetmanage.firebase.Firestore.Companion.setBoardAndTask
 import small.app.projetmanage.fragments.TaskListFragment
+import small.app.projetmanage.fragments.TaskListFragmentDirections
 import small.app.projetmanage.models.Board
 import small.app.projetmanage.models.Card
 import small.app.projetmanage.models.Task
@@ -143,6 +147,22 @@ open class TaskListItemsAdapter(
             val adapter = CardListItemsAdapter(context, task.cards)
             holder.itemView.rv_card_list.adapter = adapter
 
+            adapter.setOnClickListener(object :
+                OnClickListener {
+                override fun onClick(model: Parcelable) {
+                    setBoardAndTask(
+                        board,
+                        task
+                    )//Set the board and task linked to the card to update the card after
+                    findNavController(frag).navigate(
+                        TaskListFragmentDirections.actionTaskListFragmentToCardDetailsFragment(
+                            model as Card,
+                            position
+                        )
+                    )
+                }
+
+            })
         }
 
 

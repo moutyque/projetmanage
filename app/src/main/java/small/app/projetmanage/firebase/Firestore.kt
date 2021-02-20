@@ -9,10 +9,11 @@ import com.google.firebase.auth.FirebaseAuth.getInstance
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
-import small.app.projetmanage.R
 import small.app.projetmanage.activities.MainActivity
 import small.app.projetmanage.fragments.MainFragment
 import small.app.projetmanage.models.Board
+import small.app.projetmanage.models.Card
+import small.app.projetmanage.models.Task
 import small.app.projetmanage.models.User
 import small.app.projetmanage.utils.Constants
 import small.app.projetmanage.utils.Constants.ASSIGNED_TO
@@ -25,6 +26,14 @@ class Firestore {
     companion object {
         private val mFirestore = FirebaseFirestore.getInstance()
         var loginUser = MutableLiveData<User>()
+
+        lateinit var _board: Board
+        lateinit var _task: Task
+
+        fun setBoardAndTask(board: Board, task: Task) {
+            _board = board
+            _task = task
+        }
 
         fun updateUserProfileData(userMap: HashMap<String, Any>, activity: MainActivity) {
             val image = MutableLiveData<String>()
@@ -44,18 +53,23 @@ class Firestore {
             })
         }
 
-        fun registerUser(activity: MainActivity, userInfo: User) {
+        fun registerUser(userInfo: User) {
             mFirestore.collection(USERS).document(getCurrentUserId())
                 .set(userInfo, SetOptions.merge())
                 .addOnSuccessListener {
-                    userRegisteredSuccess(activity)
+
+                    Log.e("RegisterUser", "Succes to register the user.")
 
                 }.addOnFailureListener { e ->
-                    Log.e(activity.javaClass.simpleName, "Error writing document.")
+                    Log.e("RegisterUser", "Error writing document.")
                 }
         }
 
-        fun createBoard(activity: MainActivity, boardInfo: Board) {
+        fun createBoard(
+            activity: MainActivity,
+            boardInfo: Board,
+            success: MutableLiveData<Boolean>
+        ) {
             val image = MutableLiveData<String>()
             uploadAndUpdatePicture(image = boardInfo.image, activity = activity, result = image)
             image.observe(activity, Observer {
@@ -70,10 +84,10 @@ class Firestore {
                     .document()
                     .set(bInfo, SetOptions.merge())
                     .addOnSuccessListener {
-                        createBoardSuccess(activity)
+                        success.value = true
 
                     }.addOnFailureListener { e ->
-                        Log.e(activity.javaClass.simpleName, "Error writing document.")
+                        Log.e("CreateBoard", "Error writing document.")
                     }
 
             })
@@ -85,21 +99,13 @@ class Firestore {
                 .document(boardInfo.documentId)
                 .update(boardInfo.toHashMap())
                 .addOnSuccessListener {
+                    Log.d("UpdateBoard", "Success to update board")
 
                 }.addOnFailureListener { e ->
-                    Log.e("Firestore", "Error writing document.")
+                    Log.e("UpdateBoard", "Error updating board.")
                 }
         }
 
-        private fun createBoardSuccess(activity: MainActivity) {
-            Toast.makeText(
-                activity.applicationContext,
-                "You have successfully registered",
-                Toast.LENGTH_SHORT
-            ).show()
-            activity.navController.navigate(R.id.mainFragment)
-
-        }
 
         fun signInUser() {
             mFirestore.collection(USERS).document(getCurrentUserId())
@@ -126,17 +132,6 @@ class Firestore {
             return currentUserId
         }
 
-        private fun userRegisteredSuccess(activity: MainActivity) {
-            Toast.makeText(
-                activity.applicationContext,
-                "You have successfully registered",
-                Toast.LENGTH_SHORT
-            ).show()
-
-            activity.navController.navigate(R.id.mainFragment)
-
-            //getInstance().signOut()
-        }
 
         /**
          *This methode wait for the end of the upload to end : can be improve later with a workManager
@@ -205,6 +200,79 @@ class Firestore {
 
         }
 
+
+        fun getAssignedMembersListDetails(
+            members: MutableLiveData<List<User>>,
+            assignedTo: ArrayList<String>
+        ) {
+
+            mFirestore.collection(USERS) // Collection Name
+                .whereIn(
+                    Constants.ID,
+                    assignedTo
+                ) // Here the database field name and the id's of the members.
+                .get()
+                .addOnSuccessListener { document ->
+                    Log.e("GetBoardUser", document.documents.toString())
+
+                    val usersList: ArrayList<User> = ArrayList()
+
+                    for (i in document.documents) {
+                        // Convert all the document snapshot to the object using the data model class.
+                        val user = i.toObject(User::class.java)!!
+                        usersList.add(user)
+                    }
+
+                    members.value = usersList
+                }
+                .addOnFailureListener { e ->
+                    Log.e(
+                        "GetBoardUser",
+                        "Error while creating a board.",
+                        e
+                    )
+                }
+        }
+
+        fun getUserByEmail(
+            user: MutableLiveData<User>,
+            email: String
+        ) {
+
+            mFirestore.collection(USERS) // Collection Name
+                .whereEqualTo(
+                    Constants.EMAIL,
+                    email
+                )// Here the database field name and the id's of the members.
+                .get()
+                .addOnSuccessListener { document ->
+
+                    if (!document.isEmpty) {
+                        user.value = document.documents[0].toObject(User::class.java)!!
+                    }
+
+                }
+                .addOnFailureListener { e ->
+                    Log.e(
+                        "getUserByEmail",
+                        "Error while getting user by email.",
+                        e
+                    )
+                }
+        }
+
+        fun updateCard(card: Card?, position: Int): Board {
+            val taskIndex = _board.taskList.indexOf(_task)
+            _task.cards.removeAt(position)
+            if (card != null) {
+                _task.cards.add(position, card)
+            }
+            _board.taskList.removeAt(taskIndex)
+            _board.taskList.add(taskIndex, _task)
+            updateBoardTaskList(_board)
+            return _board
+
+        }
 
     }//End of companion object
 }

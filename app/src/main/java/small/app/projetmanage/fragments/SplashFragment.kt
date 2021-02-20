@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import kotlinx.android.synthetic.main.fragment_splash.*
 import small.app.projetmanage.R
+import small.app.projetmanage.activities.MainActivity
 import small.app.projetmanage.firebase.Firestore
 import small.app.projetmanage.firebase.Firestore.Companion.signInUser
 
@@ -43,9 +44,7 @@ class SplashFragment : Fragment() {
             var currentUserId = Firestore.getCurrentUserId()
             if (!currentUserId.isNullOrEmpty()) {
                 signInUser()
-
-                view.findNavController()
-                    .navigate(SplashFragmentDirections.actionSplashFragmentToMainFragment())
+                (requireActivity() as MainActivity).navigateFirstTabWithClearStack(R.id.mainFragment)
             } else {
                 view.findNavController()
                     .navigate(SplashFragmentDirections.actionSplashFragmentToIntroFragment())

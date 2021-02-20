@@ -78,10 +78,38 @@
         <argument
             android:name="board"
             app:argType="small.app.projetmanage.models.Board" />
+        <action
+            android:id="@+id/action_taskListFragment_to_cardDetailsFragment"
+            app:destination="@id/cardDetailsFragment" />
     </fragment>
     <fragment
         android:id="@+id/membersFragment"
         android:name="small.app.projetmanage.fragments.MembersFragment"
         android:label="fragment_members"
-        tools:layout="@layout/fragment_members" />
+        tools:layout="@layout/fragment_members">
+        <argument
+            android:name="board"
+            app:argType="small.app.projetmanage.models.Board" />
+    </fragment>
+    <action
+        android:id="@+id/action_global_membersFragment"
+        app:destination="@id/membersFragment" />
+    <fragment
+        android:id="@+id/cardDetailsFragment"
+        android:name="small.app.projetmanage.fragments.CardDetailsFragment"
+        android:label="fragment_card_details"
+        tools:layout="@layout/fragment_card_details">
+        <argument
+            android:name="card"
+            app:argType="small.app.projetmanage.models.Card" />
+        <argument
+            android:name="position"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_cardDetailsFragment_to_taskListFragment"
+            app:destination="@id/taskListFragment" />
+    </fragment>
+    <action
+        android:id="@+id/action_global_mainFragment"
+        app:destination="@id/mainFragment" />
 </navigation>

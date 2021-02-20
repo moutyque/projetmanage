@@ -6,13 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.android.synthetic.main.fragment_signup.*
 import small.app.projetmanage.R
 import small.app.projetmanage.activities.BaseActivity
-import small.app.projetmanage.activities.MainActivity
+import small.app.projetmanage.databinding.FragmentSignupBinding
 import small.app.projetmanage.firebase.Firestore
 import small.app.projetmanage.models.User
 
@@ -23,6 +24,7 @@ import small.app.projetmanage.models.User
  */
 class SignupFragment : DefaultFragment() {
 
+    private lateinit var binding: FragmentSignupBinding
 
     private lateinit var activity: BaseActivity
     override fun onCreateView(
@@ -31,7 +33,15 @@ class SignupFragment : DefaultFragment() {
     ): View? {
         activity = requireActivity() as BaseActivity
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_signup, container, false)
+        binding = FragmentSignupBinding.inflate(inflater)
+        binding.lifecycleOwner = viewLifecycleOwner
+
+
+        Firestore.loginUser.observe(viewLifecycleOwner, Observer {
+            requireView().findNavController()
+                .navigate(SignupFragmentDirections.actionSignupFragmentToMainFragment())
+        })
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -79,9 +89,8 @@ class SignupFragment : DefaultFragment() {
                     if (task.isSuccessful) {
                         val firebaseUser: FirebaseUser = task.result!!.user!!
                         val user = User(email = email, name = name, uid = firebaseUser.uid)
-                        Firestore.registerUser(activity as MainActivity, user)
-                        requireView().findNavController()
-                            .navigate(SignupFragmentDirections.actionSignupFragmentToMainFragment())
+                        Firestore.registerUser(user)
+
 
                     } else {
                         activity.showErrorSnackBar(task.exception!!.message!!)

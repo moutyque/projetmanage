@@ -13,7 +13,7 @@ import small.app.projetmanage.models.Board
 open class BoardItemsAdapter(private val context: Context, private var list: ArrayList<Board>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var onClickListener: BoardItemsViewHolder.OnClickListener? = null
+    private var onClickListener: OnClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return BoardItemsViewHolder(
@@ -38,7 +38,7 @@ open class BoardItemsAdapter(private val context: Context, private var list: Arr
             holder.itemView.setOnClickListener {
 
 
-                if (onClickListener != null) onClickListener!!.onClick(position, model)
+                if (onClickListener != null) onClickListener!!.onClick(model)
             }
         }
 
@@ -49,13 +49,11 @@ open class BoardItemsAdapter(private val context: Context, private var list: Arr
         return list.size
     }
 
-    fun setOnClickListener(onClickListener: BoardItemsViewHolder.OnClickListener) {
+    fun setOnClickListener(onClickListener: OnClickListener) {
         this.onClickListener = onClickListener
     }
 
     class BoardItemsViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        interface OnClickListener {
-            fun onClick(position: Int, model: Board)
-        }
+
     }
 }

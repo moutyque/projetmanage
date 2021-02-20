@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_card.view.*
 import small.app.projetmanage.R
-import small.app.projetmanage.adapters.BoardItemsAdapter.BoardItemsViewHolder.OnClickListener
 import small.app.projetmanage.models.Card
 
 class CardListItemsAdapter(private val context: Context, private var list: ArrayList<Card>) :
@@ -25,6 +24,9 @@ class CardListItemsAdapter(private val context: Context, private var list: Array
         val card = list[position]
         if (holder is CardViewHolder) {
             holder.itemView.tv_card_name.text = card.name
+            holder.itemView.setOnClickListener {
+                onClickListener?.onClick(card)
+            }
         }
     }
 

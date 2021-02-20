@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_task_list.*
@@ -14,16 +15,6 @@ import small.app.projetmanage.models.Board
 import small.app.projetmanage.models.Task
 
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [TaskListFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class TaskListFragment : Fragment() {
 
     val args: TaskListFragmentArgs by navArgs()
@@ -45,8 +36,6 @@ class TaskListFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
-
         rv_task_list.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         rv_task_list.setHasFixedSize(true)
@@ -55,12 +44,14 @@ class TaskListFragment : Fragment() {
     }
 
     override fun onResume() {
+
         //Task for the button, it's a trick
         val addTaskList = Task(resources.getString(R.string.add_list))
         board.taskList.add(addTaskList)
 
         val adapter = TaskListItemsAdapter(requireContext(), board.taskList, board, this)
         rv_task_list.adapter = adapter
+
         super.onResume()
     }
 
@@ -73,6 +64,20 @@ class TaskListFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_members, menu)
         super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_members -> {
+                requireView().findNavController().navigate(
+                    MembersFragmentDirections.actionGlobalMembersFragment(
+                        board = board
+                    )
+                )
+
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 }
 

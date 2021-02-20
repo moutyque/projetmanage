@@ -25,7 +25,11 @@ import small.app.projetmanage.utils.Constants.updatePictureInFragment
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var binding: ActivityMainBinding
-    lateinit var navController: NavController
+    private lateinit var navController: NavController
+
+    fun setNavController(navController: NavController) {
+        this.navController = navController
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -113,14 +117,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_members -> {
-                findNavController(R.id.fragment_nav).navigate(R.id.membersFragment)
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
 
     fun navigateFirstTabWithClearStack(id: Int) {
         val navController = findNavController(R.id.fragment_nav)

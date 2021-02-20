@@ -11,9 +11,10 @@ import com.bumptech.glide.Glide
 
 object Constants {
 
+    const val EMAIL = "email"
     const val USERS = "Users"
     const val BOARD = "Boards"
-    const val TASK = "Task"
+    const val ID = "uid"
     const val PICK_IMAGE_REQUEST_CODE = 2
     const val ASSIGNED_TO = "assignedTo"
 

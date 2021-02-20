@@ -9,10 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
 import kotlinx.android.synthetic.main.fragment_create_board.*
-import kotlinx.coroutines.launch
 import small.app.projetmanage.R
 import small.app.projetmanage.activities.BaseActivity
 import small.app.projetmanage.activities.MainActivity
@@ -52,14 +51,18 @@ class CreateBoardFragment : Fragment() {
             Constants.showImagePicker(this)
         }
 
+        val success = MutableLiveData<Boolean>(false)
         binding.btnCreate.setOnClickListener {
-
-
-            lifecycleScope.launch {
-                Firestore.createBoard(requireActivity() as MainActivity, model.toBoard())
-            }
-
+            Firestore.createBoard(requireActivity() as MainActivity, model.toBoard(), success)
         }
+
+        success.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                (requireActivity() as MainActivity).navigateFirstTabWithClearStack(R.id.mainFragment)
+
+
+            }
+        })
 
 
         return binding.root
@@ -79,7 +82,13 @@ class CreateBoardFragment : Fragment() {
     override fun onPause() {
         (requireActivity() as BaseActivity).supportActionBar!!.title =
             resources.getString(R.string.app_name)
+
         super.onPause()
+    }
+
+    override fun onDestroy() {
+
+        super.onDestroy()
     }
 
 

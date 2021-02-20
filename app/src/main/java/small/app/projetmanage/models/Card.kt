@@ -5,7 +5,7 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class Card(
-    val name: String = "",
+    var name: String = "",
     val createdBy: String = "",
     val assignedTo: MutableList<String> = ArrayList()
 ) : Parcelable
