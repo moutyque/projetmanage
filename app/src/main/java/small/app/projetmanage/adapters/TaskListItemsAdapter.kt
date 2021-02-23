@@ -21,13 +21,15 @@ import small.app.projetmanage.fragments.TaskListFragmentDirections
 import small.app.projetmanage.models.Board
 import small.app.projetmanage.models.Card
 import small.app.projetmanage.models.Task
+import small.app.projetmanage.models.User
 
 
 open class TaskListItemsAdapter(
     private val context: Context,
     private var list: ArrayList<Task>,
     val board: Board,
-    val frag: TaskListFragment
+    val frag: TaskListFragment,
+    val users: Array<User>
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     //Define the layout of the recycler view
@@ -150,6 +152,7 @@ open class TaskListItemsAdapter(
             adapter.setOnClickListener(object :
                 OnClickListener {
                 override fun onClick(model: Parcelable) {
+
                     setBoardAndTask(
                         board,
                         task
@@ -157,7 +160,8 @@ open class TaskListItemsAdapter(
                     findNavController(frag).navigate(
                         TaskListFragmentDirections.actionTaskListFragmentToCardDetailsFragment(
                             model as Card,
-                            position
+                            position,
+                            users
                         )
                     )
                 }

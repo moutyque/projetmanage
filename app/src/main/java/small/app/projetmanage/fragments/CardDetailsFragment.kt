@@ -1,6 +1,9 @@
 package small.app.projetmanage.fragments
 
+import android.app.Dialog
+import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -9,16 +12,24 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import small.app.projetmanage.R
 import small.app.projetmanage.databinding.FragmentCardDetailsBinding
+import small.app.projetmanage.dialogs.LabelColorListDialog
 import small.app.projetmanage.firebase.Firestore
 import small.app.projetmanage.models.Card
 import small.app.projetmanage.models.CardModel
 
+//TODO : remove it from the stack
 
+//TODO : get the board member in the card
 class CardDetailsFragment : Fragment() {
 
     val args: CardDetailsFragmentArgs by navArgs()
     private lateinit var card: Card
     private var position: Int = -1
+
+    private var dialog: Dialog? = null
+
+    private val colors =
+        listOf("#43C86F", "#0C90F1", "#F72400", "#7A8089", "#D57C1D", "#770000", "#0022F8")
 
     private lateinit var model: CardModel
     private lateinit var binding: FragmentCardDetailsBinding
@@ -27,7 +38,10 @@ class CardDetailsFragment : Fragment() {
         card = args.card
         position = args.position
         setHasOptionsMenu(true)
+        for (u in args.members) {
+            Log.d("CardDetails", u.name)
 
+        }
         super.onCreate(savedInstanceState)
 
     }
@@ -46,9 +60,15 @@ class CardDetailsFragment : Fragment() {
             card.name = it
         })
         binding.etNameCardDetails.addTextChangedListener { text -> card.name = text.toString() }
+        model.color.value = card.color
+        model.color.observe(viewLifecycleOwner, Observer {
+            if (dialog != null) dialog!!.dismiss()
+            setColor()
 
+        })
+
+        //Update card info
         binding.btnUpdateCardDetails.setOnClickListener {
-
             findNavController().navigate(
                 CardDetailsFragmentDirections.actionCardDetailsFragmentToTaskListFragment(
                     Firestore.updateCard(card, position)
@@ -56,13 +76,34 @@ class CardDetailsFragment : Fragment() {
             )
         }
 
+        //
+        binding.tvSelectLabelColor.setOnClickListener {
+            dialog =
+                LabelColorListDialog(
+                    requireContext(),
+                    resources.getString(R.string.str_select_label_color),
+                    colors,
+                    model.color
+                )
+            (dialog as LabelColorListDialog).show()
+        }
+
 
         // Inflate the layout for this fragment
         return binding.root
     }
 
+    private fun setColor() {
+        if (!model.color.value.isNullOrEmpty()) {
+            binding.tvSelectLabelColor.text = ""
+            binding.tvSelectLabelColor.setBackgroundColor(Color.parseColor(model.color.value))
+            card.color = model.color.value!!
+        }
+
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        (requireActivity()).actionBar?.setTitle(card.name)
+        (requireActivity()).actionBar?.title = card.name
         super.onViewCreated(view, savedInstanceState)
     }
 

@@ -1,6 +1,7 @@
 package small.app.projetmanage.adapters
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +27,10 @@ class CardListItemsAdapter(private val context: Context, private var list: Array
             holder.itemView.tv_card_name.text = card.name
             holder.itemView.setOnClickListener {
                 onClickListener?.onClick(card)
+            }
+            if (card.color.isNotEmpty()) {
+                holder.itemView.view_label_color.visibility = View.VISIBLE
+                holder.itemView.view_label_color.setBackgroundColor(Color.parseColor(card.color))
             }
         }
     }

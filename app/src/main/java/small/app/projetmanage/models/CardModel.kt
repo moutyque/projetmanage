@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 
 class CardModel {
 
-    var name = MutableLiveData<String>("")
+    var name = MutableLiveData("")
+    var color = MutableLiveData<String>()
 
 }

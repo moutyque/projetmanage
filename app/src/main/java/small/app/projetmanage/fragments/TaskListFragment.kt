@@ -1,9 +1,10 @@
 package small.app.projetmanage.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -11,8 +12,10 @@ import kotlinx.android.synthetic.main.fragment_task_list.*
 import small.app.projetmanage.R
 import small.app.projetmanage.activities.MainActivity
 import small.app.projetmanage.adapters.TaskListItemsAdapter
+import small.app.projetmanage.firebase.Firestore
 import small.app.projetmanage.models.Board
 import small.app.projetmanage.models.Task
+import small.app.projetmanage.models.User
 
 
 class TaskListFragment : Fragment() {
@@ -27,8 +30,6 @@ class TaskListFragment : Fragment() {
         board = args.board
 
         (requireActivity() as MainActivity).setActionBarTitle(board.name)
-        Log.d("TaskList", "We get board : ${args.board.name}")
-        Log.d("TaskList", "its id is : ${args.board.documentId}")
 
         setHasOptionsMenu(true)
         // Inflate the layout for this fragment
@@ -49,8 +50,20 @@ class TaskListFragment : Fragment() {
         val addTaskList = Task(resources.getString(R.string.add_list))
         board.taskList.add(addTaskList)
 
-        val adapter = TaskListItemsAdapter(requireContext(), board.taskList, board, this)
-        rv_task_list.adapter = adapter
+        val users = MutableLiveData<List<User>>()
+        Firestore.getAssignedMembersListDetails(users, board.assignedTo)
+        users.observe(viewLifecycleOwner, Observer {
+            val adapter = TaskListItemsAdapter(
+                requireContext(),
+                board.taskList,
+                board,
+                this,
+                it.toTypedArray()
+            )
+            rv_task_list.adapter = adapter
+        })
+
+
 
         super.onResume()
     }
