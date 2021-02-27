@@ -44,13 +44,7 @@ class MembersFragment : Fragment() {
         })
 
         newMember.observe(viewLifecycleOwner, {
-//            val value = members.value
-//            val tmpList = ArrayList<User>()
-//            for (u in members.value!!) {
-//                tmpList.add(u)
-//            }
-//            tmpList.add(it)
-//            members.value = tmpList
+
             args.board.assignedTo.add(it.uid)
             refreshList()
         })

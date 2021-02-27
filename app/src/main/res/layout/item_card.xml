@@ -29,6 +29,7 @@
             android:textSize="@dimen/item_card_name_text_size"
             tools:text="Card Name" />
 
+
         <TextView
             android:id="@+id/tv_members_name"
             android:layout_width="wrap_content"

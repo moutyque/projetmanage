@@ -174,7 +174,7 @@ open class TaskListItemsAdapter(
 
     private fun addCardToTaskList(name: String, position: Int) {
         val card = Card(name = name, createdBy = Firestore.loginUser.value!!.name)
-        card.assignedTo.add(Firestore.loginUser.value!!.uid)
+        card.assignedTo.plus(Firestore.loginUser.value!!.uid)
         val task = board.taskList[position]
         task.cards.add(card)
         updateTaskList(task, position)
