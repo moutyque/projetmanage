@@ -143,10 +143,11 @@ open class TaskListItemsAdapter(
 
             }
 
-            holder.itemView.rv_card_list.layoutManager = LinearLayoutManager(context)
 
+
+            holder.itemView.rv_card_list.layoutManager = LinearLayoutManager(context)
             holder.itemView.rv_card_list.setHasFixedSize(true)
-            val adapter = CardListItemsAdapter(context, task.cards)
+            val adapter = CardListItemsAdapter(context, task.cards, users.toList())
             holder.itemView.rv_card_list.adapter = adapter
 
             adapter.setOnClickListener(object :

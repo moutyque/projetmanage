@@ -50,7 +50,7 @@ class TaskListFragment : Fragment() {
         val addTaskList = Task(resources.getString(R.string.add_list))
         board.taskList.add(addTaskList)
 
-        val users = MutableLiveData<List<User>>()
+    val users = MutableLiveData<ArrayList<User>>()
         Firestore.getAssignedMembersListDetails(users, board.assignedTo)
         users.observe(viewLifecycleOwner, Observer {
             val adapter = TaskListItemsAdapter(
@@ -62,9 +62,6 @@ class TaskListFragment : Fragment() {
             )
             rv_task_list.adapter = adapter
         })
-
-
-
         super.onResume()
     }
 

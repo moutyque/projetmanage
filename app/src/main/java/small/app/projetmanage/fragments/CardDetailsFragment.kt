@@ -1,9 +1,12 @@
 package small.app.projetmanage.fragments
 
+import android.app.DatePickerDialog
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.annotation.RequiresApi
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
@@ -20,7 +23,11 @@ import small.app.projetmanage.firebase.Firestore
 import small.app.projetmanage.models.Card
 import small.app.projetmanage.models.CardModel
 import small.app.projetmanage.models.User
+import java.time.*
+import java.time.temporal.ChronoField
+import java.util.*
 import java.util.function.Consumer
+import kotlin.collections.ArrayList
 
 //TODO : remove it from the stack
 
@@ -56,6 +63,7 @@ class CardDetailsFragment : Fragment() {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -91,6 +99,8 @@ class CardDetailsFragment : Fragment() {
 
         //Update card info
         binding.btnUpdateCardDetails.setOnClickListener {
+            selectedMembersList.removeLast()
+            card.assignedTo.clear()
             selectedMembersList.forEach(Consumer { u -> card.assignedTo.add(u.uid) })
             findNavController().navigate(
                 CardDetailsFragmentDirections.actionCardDetailsFragmentToTaskListFragment(
@@ -111,6 +121,41 @@ class CardDetailsFragment : Fragment() {
             colorDialog!!.show()
         }
 
+        if (card.dueDate > 0) {
+            val date: LocalDate =
+                Instant.ofEpochMilli(card.dueDate).atZone(ZoneId.systemDefault()).toLocalDate()
+            binding.tvSelectDueDate.text =
+                String.format("${date.year}/${date.monthValue}/${date.dayOfMonth}")
+        }
+
+        //Manage due date
+        binding.tvSelectDueDate.setOnClickListener {
+            val cldr = Calendar.getInstance()
+            val day = cldr.get(Calendar.DAY_OF_MONTH)
+            val month = cldr.get(Calendar.MONTH)
+            val year = cldr.get(Calendar.YEAR)
+            // date picker dialog
+            val picker = DatePickerDialog(
+                requireActivity(),
+                { _, year, month, day ->
+                    val dateTime =
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                            LocalDateTime.of(year, month, day, 0, 0, 0)
+                        } else {
+                            TODO("VERSION.SDK_INT < O")
+                        }
+
+                    binding.tvSelectDueDate.text = String.format("$year/$month/$day")
+                    card.dueDate = dateTime.toMilliSeconds()
+                },
+                year,
+                month,
+                day
+            )
+            picker.show()
+
+        }
+
 
         // Inflate the layout for this fragment
         return binding.root
@@ -128,9 +173,9 @@ class CardDetailsFragment : Fragment() {
     private fun setMember() {
         if (model.user.value != null) {
 
-            binding.rvCardSelectedMembersList.visibility = View.VISIBLE
+            binding.rvSelectedMembersList.visibility = View.VISIBLE
 
-            binding.rvCardSelectedMembersList.layoutManager =
+            binding.rvSelectedMembersList.layoutManager =
                 GridLayoutManager(requireActivity(), 6)
 
 
@@ -139,7 +184,7 @@ class CardDetailsFragment : Fragment() {
             val clickListener = object : CardMemberListItemsAdapter.OnClickListener {
                 override fun onClick() {
                     val adapter =
-                        (binding.rvCardSelectedMembersList.adapter as CardMemberListItemsAdapter)
+                        (binding.rvSelectedMembersList.adapter as CardMemberListItemsAdapter)
                     var selectedUser = MutableLiveData<User>()
                     //Add new selected user
                     selectedUser.observe(viewLifecycleOwner, Observer {
@@ -153,15 +198,13 @@ class CardDetailsFragment : Fragment() {
                             "AdapterChange", adapter.itemCount.toString()
                         )
                         if (it.isSelected) {
-                            (model.user.value!! as ArrayList).add(0, it)
-                            selectedMembersList.add(0, it)
-
+                            model.user.value!!.add(0, it)
                         } else {
-                            (model.user.value!! as ArrayList).remove(it)
-                            selectedMembersList.remove(it)
-
-
+                            model.removeUser(it.uid)
                         }
+                        selectedMembersList.clear()
+                        selectedMembersList.addAll(model.user.value!!)
+                        selectedMembersList.add(User())
                         membersDialog?.dismiss()
 
                         adapter.notifyDataSetChanged()
@@ -173,7 +216,12 @@ class CardDetailsFragment : Fragment() {
                     })
                     //TODO : Bug les membres déjà selectionné n'apparaissent pas comme tel dans le dialog
                     members.forEach { m ->
-                        if (selectedMembersList.contains(m)) {
+                        m.isSelected = false
+                        if (selectedMembersList.stream().map { u -> u.uid }
+                                .filter { u -> u.equals(m.uid) }.count().compareTo(
+                                    1
+                                ) == 0
+                        ) {
                             m.isSelected = true
                         }
                     }
@@ -186,9 +234,9 @@ class CardDetailsFragment : Fragment() {
                     membersDialog!!.show()
                 }
             }
-            binding.rvCardSelectedMembersList.adapter =
+            binding.rvSelectedMembersList.adapter =
                 CardMemberListItemsAdapter(requireActivity(), selectedMembersList)
-            (binding.rvCardSelectedMembersList.adapter as CardMemberListItemsAdapter).setOnClickListener(
+            (binding.rvSelectedMembersList.adapter as CardMemberListItemsAdapter).setOnClickListener(
                 clickListener
             )
 
@@ -228,4 +276,12 @@ class CardDetailsFragment : Fragment() {
         }
         return super.onOptionsItemSelected(item)
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+private fun LocalDateTime.toMilliSeconds(): Long {
+    return (this.toEpochSecond(ZoneOffset.UTC) * 1000
+            + this.get(ChronoField.MILLI_OF_SECOND))
+
+
 }

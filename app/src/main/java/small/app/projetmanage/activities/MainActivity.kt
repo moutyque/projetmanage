@@ -15,7 +15,6 @@ import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.nav_header_main.*
-import kotlinx.android.synthetic.main.nav_layout.view.*
 import small.app.projetmanage.R
 import small.app.projetmanage.databinding.ActivityMainBinding
 import small.app.projetmanage.firebase.Firestore
@@ -35,10 +34,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        binding.drawerLayout.fab_create_board.setOnClickListener {
-            navController.navigate(R.id.createBoardFragment)
 
-        }
         setContentView(binding.root)
         window.setFlags(
             WindowManager.LayoutParams.FLAG_FULLSCREEN,

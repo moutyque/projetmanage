@@ -14,7 +14,8 @@ import small.app.projetmanage.models.User
 // START
 open class CardMemberListItemsAdapter(
     private val context: Context,
-    private var list: ArrayList<User>
+    private var list: ArrayList<User>,
+    private var assigneMode: Boolean = true
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var onClickListener: OnClickListener? = null
@@ -50,7 +51,7 @@ open class CardMemberListItemsAdapter(
 
         if (holder is MyViewHolder) {
 
-            if (position == list.size - 1) {
+            if (position == list.size - 1 && assigneMode) {
                 holder.itemView.iv_add_member.visibility = View.VISIBLE
                 holder.itemView.iv_selected_member_image.visibility = View.GONE
             } else {

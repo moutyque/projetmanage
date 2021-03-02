@@ -5,12 +5,20 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.projemanag.adapters.CardMemberListItemsAdapter
 import kotlinx.android.synthetic.main.item_card.view.*
 import small.app.projetmanage.R
 import small.app.projetmanage.models.Card
+import small.app.projetmanage.models.User
+import java.util.stream.Collectors
 
-class CardListItemsAdapter(private val context: Context, private var list: ArrayList<Card>) :
+class CardListItemsAdapter(
+    private val context: Context,
+    private var list: ArrayList<Card>,
+    private val users: List<User>
+) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var onClickListener: OnClickListener? = null
 
@@ -25,6 +33,21 @@ class CardListItemsAdapter(private val context: Context, private var list: Array
         val card = list[position]
         if (holder is CardViewHolder) {
             holder.itemView.tv_card_name.text = card.name
+            //TODO : get the user assigned to the card
+            val assignedUsers = users.stream().filter { u -> card.assignedTo.contains(u.uid) }
+                .collect(Collectors.toList())
+            if (assignedUsers.isNotEmpty()) {
+                holder.itemView.rv_card_selected_members_list.visibility = View.VISIBLE
+                holder.itemView.rv_card_selected_members_list.layoutManager =
+                    GridLayoutManager(context, 4)
+                holder.itemView.rv_card_selected_members_list.setHasFixedSize(true)
+                val adapter =
+                    CardMemberListItemsAdapter(context, assignedUsers as ArrayList<User>, false)
+                holder.itemView.rv_card_selected_members_list.adapter = adapter
+            } else {
+                holder.itemView.rv_card_selected_members_list.visibility = View.GONE
+            }
+
             holder.itemView.setOnClickListener {
                 onClickListener?.onClick(card)
             }

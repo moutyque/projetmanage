@@ -202,36 +202,41 @@ class Firestore {
 
 
         fun getAssignedMembersListDetails(
-            members: MutableLiveData<List<User>>,
+            members: MutableLiveData<ArrayList<User>>,
             assignedTo: ArrayList<String>
         ) {
+            if (assignedTo.isEmpty()) {
+                members.value = ArrayList()
 
-            mFirestore.collection(USERS) // Collection Name
-                .whereIn(
-                    Constants.ID,
-                    assignedTo
-                ) // Here the database field name and the id's of the members.
-                .get()
-                .addOnSuccessListener { document ->
-                    Log.e("GetBoardUser", document.documents.toString())
+            } else {
+                mFirestore.collection(USERS) // Collection Name
+                    .whereIn(
+                        Constants.ID,
+                        assignedTo
+                    ) // Here the database field name and the id's of the members.
+                    .get()
+                    .addOnSuccessListener { document ->
+                        Log.e("GetBoardUser", document.documents.toString())
 
-                    val usersList: ArrayList<User> = ArrayList()
+                        val usersList: ArrayList<User> = ArrayList()
 
-                    for (i in document.documents) {
-                        // Convert all the document snapshot to the object using the data model class.
-                        val user = i.toObject(User::class.java)!!
-                        usersList.add(user)
+                        for (i in document.documents) {
+                            // Convert all the document snapshot to the object using the data model class.
+                            val user = i.toObject(User::class.java)!!
+                            usersList.add(user)
+                        }
+
+                        members.value = usersList
                     }
+                    .addOnFailureListener { e ->
+                        Log.e(
+                            "GetBoardUser",
+                            "Error while creating a board.",
+                            e
+                        )
+                    }
+            }
 
-                    members.value = usersList
-                }
-                .addOnFailureListener { e ->
-                    Log.e(
-                        "GetBoardUser",
-                        "Error while creating a board.",
-                        e
-                    )
-                }
         }
 
         fun getUserByEmail(

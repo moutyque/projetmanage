@@ -22,7 +22,7 @@ import small.app.projetmanage.models.User
 class MembersFragment : Fragment() {
     private lateinit var binding: FragmentMembersBinding
     val args: MembersFragmentArgs by navArgs()
-    var members = MutableLiveData<List<User>>()
+    var members = MutableLiveData<ArrayList<User>>()
     var newMember = MutableLiveData<User>()
     private var email = ""
 
