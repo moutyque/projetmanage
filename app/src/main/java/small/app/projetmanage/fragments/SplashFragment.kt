@@ -39,6 +39,10 @@ class SplashFragment : Fragment() {
         tv_app_name.typeface = typeFace
         super.onViewCreated(view, savedInstanceState)
 
+
+    }
+
+    override fun onResume() {
         Handler().postDelayed({
 
             var currentUserId = Firestore.getCurrentUserId()
@@ -46,12 +50,13 @@ class SplashFragment : Fragment() {
                 signInUser()
                 (requireActivity() as MainActivity).navigateFirstTabWithClearStack(R.id.mainFragment)
             } else {
-                view.findNavController()
+                requireView().findNavController()
                     .navigate(SplashFragmentDirections.actionSplashFragmentToIntroFragment())
             }
 
 
         }, 2500)
+        super.onResume()
     }
 
 

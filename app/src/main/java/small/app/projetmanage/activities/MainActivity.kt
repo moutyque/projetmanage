@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -18,6 +19,7 @@ import kotlinx.android.synthetic.main.nav_header_main.*
 import small.app.projetmanage.R
 import small.app.projetmanage.databinding.ActivityMainBinding
 import small.app.projetmanage.firebase.Firestore
+import small.app.projetmanage.utils.Constants
 import small.app.projetmanage.utils.Constants.showImagePicker
 import small.app.projetmanage.utils.Constants.updatePictureInFragment
 
@@ -25,6 +27,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
+
 
     fun setNavController(navController: NavController) {
         this.navController = navController
@@ -45,6 +48,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         Firestore.loginUser.observe(this, {
             if (it != null) updateNavigationUserDetails()
         })
+
     }
 
 
@@ -104,9 +108,15 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
             R.id.nav_sign_out -> {
                 FirebaseAuth.getInstance().signOut()
+
+                this.getSharedPreferences(
+                    Constants.PROJEMANAGE_PREFRENCES,
+                    AppCompatActivity.MODE_PRIVATE
+                ).edit().putBoolean(Constants.FCM_TOKEN_UPDATED, false).apply()
                 navigateFirstTabWithClearStack(R.id.introFragment)
                 //setupNavDrawer(drawer_layout,nav_view)
                 drawer_layout.closeDrawer(GravityCompat.START)
+                //Do we need to clear the main fragment preferences ?
             }
 
         }
@@ -127,16 +137,19 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     }
 
-    fun updateNavigationUserDetails() {
+    private fun updateNavigationUserDetails() {
         // The instance of the header view of the navigation view.
-        updatePictureInFragment(
-            this,
-            Firestore.loginUser.value!!.image,
-            R.drawable.ic_user_place_holder,
-            iv_user_image
-        )
+        if (iv_user_image != null) {
+            updatePictureInFragment(
+                this,
+                Firestore.loginUser.value!!.image,
+                R.drawable.ic_user_place_holder,
+                iv_user_image
+            )
 
-        tv_username.text = Firestore.loginUser.value!!.name
+        }
+
+        if (tv_username != null) tv_username.text = Firestore.loginUser.value!!.name
     }
 
     fun setActionBarTitle(title: String?) {

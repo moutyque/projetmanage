@@ -14,6 +14,7 @@ import small.app.projetmanage.activities.MainActivity
 import small.app.projetmanage.adapters.TaskListItemsAdapter
 import small.app.projetmanage.firebase.Firestore
 import small.app.projetmanage.models.Board
+import small.app.projetmanage.models.Card
 import small.app.projetmanage.models.Task
 import small.app.projetmanage.models.User
 
@@ -50,7 +51,7 @@ class TaskListFragment : Fragment() {
         val addTaskList = Task(resources.getString(R.string.add_list))
         board.taskList.add(addTaskList)
 
-    val users = MutableLiveData<ArrayList<User>>()
+        val users = MutableLiveData<ArrayList<User>>()
         Firestore.getAssignedMembersListDetails(users, board.assignedTo)
         users.observe(viewLifecycleOwner, Observer {
             val adapter = TaskListItemsAdapter(
@@ -88,6 +89,14 @@ class TaskListFragment : Fragment() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun updateCardsInTaskList(taskListPosition: Int, cards: ArrayList<Card>) {
+        board.taskList.removeLast()
+        board.taskList[taskListPosition].cards = cards
+        (requireActivity() as MainActivity).showProgressDialog()
+        Firestore.updateBoardTaskList(board)
+        (requireActivity() as MainActivity).hideProgressDialog()
     }
 }
 

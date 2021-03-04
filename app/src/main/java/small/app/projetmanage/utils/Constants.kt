@@ -11,12 +11,27 @@ import com.bumptech.glide.Glide
 
 object Constants {
 
+
+    const val FCM_TOKEN_UPDATED: String = "fcmTokenUpdated"
+    const val FCM_TOKEN: String = "fcmToken"
     const val EMAIL = "email"
     const val USERS = "Users"
     const val BOARD = "Boards"
     const val ID = "uid"
     const val PICK_IMAGE_REQUEST_CODE = 2
     const val ASSIGNED_TO = "assignedTo"
+
+    const val FCM_BASE_URL: String = "https://fcm.googleapis.com/fcm/send"
+    const val FCM_AUTHORIZATION: String = "authorization"
+    const val FCM_KEY: String = "key"
+    const val FCM_SERVER_KEY: String =
+        "AAAAdsx3BfA:APA91bE2VyDSIhirWaLovvntmsftX0Hrr_nqggtgx57BvIyIr6Zw7PkycRMCFiNmFtIiNK-CrWYKeVU0akXT85vScMIAsD6Dwymr8FzofGVwNu5PIRhWrTZElpIDRw8FUYOFvXl-hoa0"
+    const val FCM_KEY_TITLE: String = "title"
+    const val FCM_KEY_MESSAGE: String = "message"
+    const val FCM_KEY_DATA: String = "data"
+    const val FCM_KEY_TO: String = "to"
+
+    const val PROJEMANAGE_PREFRENCES = "ProjetManagePrefs"
 
     fun getFileExtension(activity: Activity, uri: Uri?): String? {
         return MimeTypeMap.getSingleton()

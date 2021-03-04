@@ -24,7 +24,10 @@ class Firestore {
 
 
     companion object {
-        private val mFirestore = FirebaseFirestore.getInstance()
+        private fun getFirestore(): FirebaseFirestore {
+            return FirebaseFirestore.getInstance()
+        }
+
         var loginUser = MutableLiveData<User>()
 
         lateinit var _board: Board
@@ -36,30 +39,40 @@ class Firestore {
         }
 
         fun updateUserProfileData(userMap: HashMap<String, Any>, activity: MainActivity) {
-            val image = MutableLiveData<String>()
-            uploadAndUpdatePicture(
-                image = userMap[User.IMAGE] as String,
-                activity = activity,
-                result = image
-            )
-            image.observe(activity, Observer {
+            if (getCurrentUserId().isNullOrEmpty()) return
+            //If there is an image in the map
+            if (userMap[User.IMAGE] != null) {
+                val image = MutableLiveData<String>()
+                uploadAndUpdatePicture(
+                    image = userMap[User.IMAGE] as String,
+                    activity = activity,
+                    result = image
+                )
+                image.observe(activity, Observer {
 
 
-                userMap.put(User.IMAGE, it)
-                mFirestore.collection(USERS).document(getCurrentUserId()).update(userMap)
+                    userMap.put(User.IMAGE, it)
+                    getFirestore().collection(USERS).document(getCurrentUserId()).update(userMap)
+                        .addOnSuccessListener {
+                            Log.i("Update", "The update happend")
+                        }
+                })
+            } else {
+                getFirestore().collection(USERS).document(getCurrentUserId()).update(userMap)
                     .addOnSuccessListener {
                         Log.i("Update", "The update happend")
                     }
-            })
+            }
+
         }
 
         fun registerUser(userInfo: User) {
-            mFirestore.collection(USERS).document(getCurrentUserId())
+            getFirestore().collection(USERS).document(getCurrentUserId())
                 .set(userInfo, SetOptions.merge())
                 .addOnSuccessListener {
 
                     Log.e("RegisterUser", "Succes to register the user.")
-
+                    signInUser()
                 }.addOnFailureListener { e ->
                     Log.e("RegisterUser", "Error writing document.")
                 }
@@ -80,7 +93,7 @@ class Firestore {
                     image = it
                 )
 
-                mFirestore.collection(BOARD)
+                getFirestore().collection(BOARD)
                     .document()
                     .set(bInfo, SetOptions.merge())
                     .addOnSuccessListener {
@@ -95,7 +108,7 @@ class Firestore {
         }
 
         fun updateBoardTaskList(boardInfo: Board) {
-            mFirestore.collection(BOARD)
+            getFirestore().collection(BOARD)
                 .document(boardInfo.documentId)
                 .update(boardInfo.toHashMap())
                 .addOnSuccessListener {
@@ -108,7 +121,7 @@ class Firestore {
 
 
         fun signInUser() {
-            mFirestore.collection(USERS).document(getCurrentUserId())
+            getFirestore().collection(USERS).document(getCurrentUserId())
                 .get()
                 .addOnSuccessListener { document ->
                     loginUser.value = document.toObject(User::class.java)
@@ -178,7 +191,8 @@ class Firestore {
         }
 
         fun loadBoardsList(fragment: MainFragment) {
-            mFirestore.collection(BOARD).whereArrayContains(ASSIGNED_TO, getCurrentUserId()).get()
+            getFirestore().collection(BOARD).whereArrayContains(ASSIGNED_TO, getCurrentUserId())
+                .get()
                 .addOnSuccessListener { document ->
                     Log.i(fragment.javaClass.simpleName, document.documents.toString())
                     val boardList: ArrayList<Board> = ArrayList()
@@ -209,7 +223,7 @@ class Firestore {
                 members.value = ArrayList()
 
             } else {
-                mFirestore.collection(USERS) // Collection Name
+                getFirestore().collection(USERS) // Collection Name
                     .whereIn(
                         Constants.ID,
                         assignedTo
@@ -244,7 +258,7 @@ class Firestore {
             email: String
         ) {
 
-            mFirestore.collection(USERS) // Collection Name
+            getFirestore().collection(USERS) // Collection Name
                 .whereEqualTo(
                     Constants.EMAIL,
                     email

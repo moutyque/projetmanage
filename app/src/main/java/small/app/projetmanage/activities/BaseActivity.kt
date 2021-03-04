@@ -2,8 +2,6 @@ package small.app.projetmanage.activities
 
 import android.app.Dialog
 import android.os.Bundle
-import android.os.Handler
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
@@ -55,7 +53,8 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     fun doubleBackToExit() {
-        if (doubleBackToExistPressedOnce) {
+        super.onBackPressed()
+        /*if (doubleBackToExistPressedOnce) {
             super.onBackPressed()
             return
         }
@@ -67,7 +66,7 @@ open class BaseActivity : AppCompatActivity() {
         ).show()
         Handler().postDelayed({
             doubleBackToExistPressedOnce = false
-        }, 2000)
+        }, 2000)*/
     }
 
     fun singleBackToExit() {
